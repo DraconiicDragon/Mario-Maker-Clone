@@ -1,16 +1,21 @@
 class Map {
+  PImage tileTexture[];
   Tile tiles[][];
   int mapWidth;
   int mapHeight;
   float startX;
   float startY;
-  float tileSize = 16;
+  float tileSize = 32;
   float scale;
   
   Map(int mapWidth, int mapHeight, float scale) {
     this.mapWidth = mapWidth;
     this.mapHeight = mapHeight;
     this.scale = tileSize*scale;
+    
+    tileTexture = new PImage[2];
+    tileTexture[0] = loadImage("tiles/0.png");
+    tileTexture[1] = loadImage("tiles/1.png");
     
     tiles = new Tile[mapHeight][mapWidth];
     
@@ -36,9 +41,8 @@ class Map {
   void render() {
     float x = startX, y = startY;
     for(Tile[] i : tiles) {
-      for(Tile j : i) {
-        fill(j.tileColor);
-        rect(x, y, scale, scale);
+      for(Tile j : i) {        
+        image(tileTexture[j.id], x, y, scale, scale);
         x += scale;
       }
       y += scale;

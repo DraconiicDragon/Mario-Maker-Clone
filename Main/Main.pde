@@ -1,10 +1,11 @@
 Game game;
 
 void setup() {
-  size(160*7, 90*7);
+  size(1120, 630);
+  surface.setResizable(true);
   //fullScreen();
   game = new Game();
-  noStroke();
+  //noStroke();
 }
 
 void draw() {
@@ -26,4 +27,8 @@ void keyReleased() {
 
 void mouseWheel(MouseEvent event) {
   game.mouseWheel(event);
+}
+
+void windowResized() {
+  game.windowResized();
 }

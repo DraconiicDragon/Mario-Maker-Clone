@@ -1,12 +1,9 @@
 class Camera {
-  float playerX, playerY;
   float offsetX, offsetY;
   float offsetXLimit;
   float offsetYLimit;
   
-  Camera(float playerX, float playerY, float offsetX, float offsetY) {
-    this.playerX = playerX;
-    this.playerY = playerY;
+  Camera(float offsetX, float offsetY) {
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     
@@ -20,18 +17,14 @@ class Camera {
   }
   
   void updateOffsets(float newX, float newY) {
-    offsetX -= newX - playerX;
-    playerX = newX;
-    
+    offsetX = width/2 - newX * game.scale;
     game.offsetX = offsetX;
     if(offsetX > 0) game.offsetX = 0;
     if(offsetX < offsetXLimit) game.offsetX = offsetXLimit;
     
-    offsetY -= newY - playerY;
-    playerY = newY;
-    
+    offsetY = height/2 - newY * game.scale;
     game.offsetY = offsetY;
     if(offsetY > 0) game.offsetY = 0;
-    if(offsetY < offsetYLimit) game.offsetY = offsetYLimit;
+    if(offsetY < offsetYLimit) game.offsetY = offsetYLimit;    
   }
 }

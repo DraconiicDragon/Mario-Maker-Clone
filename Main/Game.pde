@@ -10,12 +10,18 @@ class Game {
   float scale;
   float offsetX;
   float offsetY;
+  float originalWindowWidth;
+  float originalWindowHeight;
   
-  float MAX_ZOOM = 2;
-  float MIN_ZOOM = 1;
+  float zoom;
+  final float MAX_ZOOM = 1.5;
+  final float MIN_ZOOM = 0.5;
   
   Game() {
-    scale = 1.1;
+    scale = 1.0;
+    zoom = 1.0;
+    originalWindowWidth = width;
+    originalWindowHeight = height;
     map = new Map(120, 39, scale);
     offsetX = map.startX;
     offsetY = map.startY;
@@ -23,13 +29,13 @@ class Game {
     map.preloadMap();
 
     players = new Player[1];
-    players[0] = new Player(60*16, 20*16, 20, 70);
+    players[0] = new Player(60*16, 20*16, 32, 32);
     //players[1] = new Player(width/2 + 100, height/2, 30, 40);
     focusPlayer = players[0];
     
     enemies = new Enemy[1];
     enemies[0] = new Goomba(new PVector(width/2 + 200, height/2), 30, 40, 1);
-    camera = new Camera(focusPlayer.position.x, focusPlayer.position.y, map.startX, map.startY);
+    camera = new Camera(map.startX, map.startY);
     
     collisionDetection = new CollisionDetection();
   }
@@ -54,7 +60,7 @@ class Game {
     for(Player i : players) {
       if(i.dead) continue;
       i.tick();      
-    }
+    }/*
     for(Enemy i : enemies) {
       if(i.getClass() == Goomba.class) {
         if(i.position.x > focusPlayer.position.x) i.movementSpeed = -1;
@@ -66,6 +72,7 @@ class Game {
         i.dead = false;
       }
     }
+    */
     collisionDetection.playerMap(players, map);
     collisionDetection.enemyMap(enemies, map);
     collisionDetection.playerEnemy(players, enemies);
@@ -79,6 +86,7 @@ class Game {
   }
   
   void updateScale() {
+    scale = width/originalWindowWidth * zoom;   
     map.updateScale(scale);
     camera.updateOffsetsLimit(map.startX, map.startY);
   }
@@ -99,7 +107,11 @@ class Game {
   }
   
   void mouseWheel(MouseEvent event) {
-    if(scale - 0.1 * event.getCount() <= MAX_ZOOM && scale - 0.1 * event.getCount() >= MIN_ZOOM) scale -= 0.1 * event.getCount();
+    if(zoom - 0.1 * event.getCount() <= MAX_ZOOM && zoom - 0.1 * event.getCount() >= MIN_ZOOM) zoom -= 0.1 * event.getCount();
+    updateScale();
+  }
+  
+  void windowResized() {
     updateScale();
   }
 }
