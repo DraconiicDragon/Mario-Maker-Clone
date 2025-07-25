@@ -18,6 +18,6 @@ abstract class Enemy {
   
   abstract void takeDamage();
   abstract void tick();
-  abstract void render(float scale, float offsetX, float offsetY);
+  abstract void render(float offsetX, float offsetY);
   
 }

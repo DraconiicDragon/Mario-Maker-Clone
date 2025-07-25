@@ -18,10 +18,9 @@ class Player {
   boolean up, down, left, right;
   boolean jumping;
   
-  final float GRAVITY = 10;
-  final float VERTICAL_ACCELERATION = 0.1;
-  final float JUMP_SPEED = 30;
-  final float MOVEMENT_SPEED = 5;
+  final float GRAVITY = 20;
+  final float JUMP_SPEED = 64;
+  final float MOVEMENT_SPEED = 15;
   
   Player(float x, float y, float width, float height) {
     small_mario = new PImage[2];
@@ -39,15 +38,16 @@ class Player {
     
   void tick() {
     movement.y = lerp(movement.y, GRAVITY, 0.1);
-    movement.x = lerp(movement.x, 0, 0.1);
-    
+       
     if(right) {
-      movement.x = lerp(movement.x, MOVEMENT_SPEED, 0.2);
+      movement.x = lerp(movement.x, MOVEMENT_SPEED, 0.02);
       direction = true;
     }
     else if(left) {
-      movement.x = lerp(movement.x, -MOVEMENT_SPEED, 0.2);
+      movement.x = lerp(movement.x, -MOVEMENT_SPEED, 0.02);
       direction = false;
+    } else {
+      movement.x = lerp(movement.x, 0, 0.1);
     }
     if(up && !jumping) {
        movement.y = lerp(movement.y, -JUMP_SPEED, 0.8);
@@ -55,15 +55,16 @@ class Player {
     }
   }
   
-  void render(float scale, float offsetX, float offsetY) {
+  void render(float offsetX, float offsetY) {
+    text(movement.x, 20, 20);
     if(direction) {
       pushMatrix();
       scale(-1, 1);
-      image(small_mario[walkAnimation], -(position.x*scale+offsetX+width), position.y*scale+offsetY, width*scale, height*scale);
+      image(small_mario[walkAnimation], -(position.x+offsetX+width), position.y+offsetY);
       popMatrix();
     }
     else {
-      image(small_mario[walkAnimation], position.x*scale+offsetX, position.y*scale+offsetY, width*scale, height*scale);
+      image(small_mario[walkAnimation], position.x+offsetX, position.y+offsetY);
     }
     frameCont++;
     if(frameCont > 10) {

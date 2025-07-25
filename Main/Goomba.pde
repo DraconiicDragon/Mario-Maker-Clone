@@ -10,9 +10,9 @@ class Goomba extends Enemy {
     movement.x = lerp(movement.x, movementSpeed, 0.1);
   }
   
-  void render(float scale, float offsetX, float offsetY) {
+  void render(float offsetX, float offsetY) {
     fill(#EA2121);
-    rect(position.x*scale+offsetX, position.y*scale+offsetY, this.width*scale, this.height*scale);
+    rect(position.x+offsetX, position.y+offsetY, this.width, this.height);
   }
   
   void takeDamage() {

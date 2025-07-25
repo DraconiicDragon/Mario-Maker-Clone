@@ -7,29 +7,25 @@ class Game {
   CollisionDetection collisionDetection;
   Camera camera;
   
-  float scale;
   float offsetX;
   float offsetY;
   float originalWindowWidth;
   float originalWindowHeight;
   
-  float zoom;
   final float MAX_ZOOM = 1.5;
   final float MIN_ZOOM = 0.5;
   
   Game() {
-    scale = 1.0;
-    zoom = 1.0;
     originalWindowWidth = width;
     originalWindowHeight = height;
-    map = new Map(120, 39, scale);
+    map = new Map(120, 39);
     offsetX = map.startX;
     offsetY = map.startY;
     
     map.preloadMap();
 
     players = new Player[1];
-    players[0] = new Player(60*16, 20*16, 32, 32);
+    players[0] = new Player(60*16, 20*16, 64, 64);
     //players[1] = new Player(width/2 + 100, height/2, 30, 40);
     focusPlayer = players[0];
     
@@ -49,10 +45,10 @@ class Game {
     map.render();
     for(Player i : players) {
       if(i.dead) continue;
-      i.render(scale, offsetX, offsetY);
+      i.render(offsetX, offsetY);
     }
     for(Enemy i : enemies) {
-      i.render(scale, offsetX, offsetY);
+      i.render(offsetX, offsetY);
     }
   }
   
@@ -85,12 +81,6 @@ class Game {
     map.startY = offsetY;
   }
   
-  void updateScale() {
-    scale = width/originalWindowWidth * zoom;   
-    map.updateScale(scale);
-    camera.updateOffsetsLimit(map.startX, map.startY);
-  }
-  
   void mousePressed() {
     map.mousePressed();
   }
@@ -106,12 +96,4 @@ class Game {
     focusPlayer.keyReleased();
   }
   
-  void mouseWheel(MouseEvent event) {
-    if(zoom - 0.1 * event.getCount() <= MAX_ZOOM && zoom - 0.1 * event.getCount() >= MIN_ZOOM) zoom -= 0.1 * event.getCount();
-    updateScale();
-  }
-  
-  void windowResized() {
-    updateScale();
-  }
 }

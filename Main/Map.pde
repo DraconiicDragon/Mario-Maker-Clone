@@ -5,13 +5,11 @@ class Map {
   int mapHeight;
   float startX;
   float startY;
-  float tileSize = 32;
-  float scale;
+  float tileSize = 64;
   
-  Map(int mapWidth, int mapHeight, float scale) {
+  Map(int mapWidth, int mapHeight) {
     this.mapWidth = mapWidth;
     this.mapHeight = mapHeight;
-    this.scale = tileSize*scale;
     
     tileTexture = new PImage[2];
     tileTexture[0] = loadImage("tiles/0.png");
@@ -19,8 +17,8 @@ class Map {
     
     tiles = new Tile[mapHeight][mapWidth];
     
-    startX = (width - this.scale * mapWidth) / 2;
-    startY = (height - this.scale * mapHeight) / 2;
+    startX = (width - tileSize * mapWidth) / 2;
+    startY = (height - tileSize * mapHeight) / 2;
   }
   
   void preloadMap() {
@@ -32,20 +30,14 @@ class Map {
     }
   }
   
-  void updateScale(float scale) {
-    this.scale = tileSize*scale;
-    startX = (width - this.scale * mapWidth) / 2;
-    startY = (height - this.scale * mapHeight) / 2;
-  }
-  
   void render() {
     float x = startX, y = startY;
     for(Tile[] i : tiles) {
       for(Tile j : i) {        
-        image(tileTexture[j.id], x, y, scale, scale);
-        x += scale;
+        image(tileTexture[j.id], x, y);
+        x += tileSize;
       }
-      y += scale;
+      y += tileSize;
       x = startX;
     }
   }
@@ -59,8 +51,8 @@ class Map {
   }
   
   void mousePressed() {
-    float x = (mouseX - startX) / scale;
-    float y = (mouseY - startY) / scale;
+    float x = (mouseX - startX) / tileSize;
+    float y = (mouseY - startY) / tileSize;
     if(x < 0 || y < 0 || x > mapWidth || y > mapHeight) return;
     changeTile(int(x), int(y));
   }
