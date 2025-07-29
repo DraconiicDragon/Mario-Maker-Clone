@@ -6,35 +6,59 @@ class Map {
   float startX;
   float startY;
   float tileSize = 64;
+  String map;
   
-  Map(int mapWidth, int mapHeight) {
-    this.mapWidth = mapWidth;
-    this.mapHeight = mapHeight;
-    
-    tileTexture = new PImage[2];
-    tileTexture[0] = loadImage("tiles/0.png");
-    tileTexture[1] = loadImage("tiles/1.png");
-    
-    tiles = new Tile[mapHeight][mapWidth];
+  Map(String map) {
+    this.map = map;
+    BufferedReader fileReader = createReader(map);
+    String line;
+    try {
+      line = fileReader.readLine();
+      String[] ids = split(line, " ");
+      mapWidth = int(ids[0]);
+      mapHeight = int(ids[1]);
+      tiles = new Tile[mapHeight][mapWidth];
+      int x = 0;
+      int y = 0;
+      while((line = fileReader.readLine()) != null) {
+        ids = split(line, " ");      
+        for(String i : ids) {   
+          tiles[y][x] = new Tile(int(i), new PVector(x*tileSize, y*tileSize));
+          x++;
+        }
+        x = 0;
+        y++;
+        
+      }
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
     
     startX = (width - tileSize * mapWidth) / 2;
     startY = (height - tileSize * mapHeight) / 2;
+    tileTexture = new PImage[2];
+    tileTexture[0] = loadImage("tiles/0.png");
+    tileTexture[1] = loadImage("tiles/1.png");
   }
   
-  void preloadMap() {
+  void saveMap() {
+    PrintWriter fileWriter = createWriter("data/" + map);
+    fileWriter.println(mapWidth + " " + mapHeight);
     for(int i = 0; i < mapHeight; i++) {
       for(int j = 0; j < mapWidth; j++) {
-        if(i == mapHeight-1) tiles[i][j] = new Tile(1, new PVector(j*tileSize, i*tileSize), 0);
-        else tiles[i][j] = new Tile(0, new PVector(j*tileSize, i*tileSize), 255);  
+         fileWriter.print(tiles[i][j].id);
+         if(j != mapWidth-1) fileWriter.print(" ");
       }
+      if(i != mapHeight-1) fileWriter.println();
     }
+    fileWriter.close();
   }
   
   void render() {
     float x = startX, y = startY;
     for(Tile[] i : tiles) {
       for(Tile j : i) {        
-        image(tileTexture[j.id], x, y);
+        if(x > 0 - tileSize && x < width && y > 0 - tileSize && y < height) image(tileTexture[j.id], x, y); 
         x += tileSize;
       }
       y += tileSize;
@@ -50,16 +74,15 @@ class Map {
     return int((y) / tileSize);
   }
   
-  void mousePressed() {
+  void mousePressed(int selectedTile) {
     float x = (mouseX - startX) / tileSize;
     float y = (mouseY - startY) / tileSize;
     if(x < 0 || y < 0 || x > mapWidth || y > mapHeight) return;
-    changeTile(int(x), int(y));
+    changeTile(int(x), int(y), selectedTile);
   }
   
-  void changeTile(int x, int y) {
-    tiles[y][x].id = 1;
-    tiles[y][x].tileColor = 0;
+  void changeTile(int x, int y, int selectedTile) {
+    tiles[y][x].id = selectedTile;
   }
 
 }

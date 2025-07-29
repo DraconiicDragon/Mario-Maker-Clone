@@ -1,18 +1,11 @@
 class Tile {
   int id;
   PVector position;
-  color tileColor;
   boolean solid;
   
-  Tile(int id, PVector position, color tileColor) {
+  Tile(int id, PVector position) {
     this.id = id;
     this.position = position;
-    this.tileColor = tileColor;
-  }
-  
-  Tile(int id, color tileColor) {
-    this.id = id;
-    this.tileColor = tileColor;
   }
   
   PVector getPosition() {

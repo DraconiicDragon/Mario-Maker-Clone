@@ -11,11 +11,6 @@ class Camera {
     offsetYLimit = 2 * offsetY;
   }
   
-  void updateOffsetsLimit(float offsetX, float offsetY) {
-    offsetXLimit = 2 * offsetX;
-    offsetYLimit = 2 * offsetY;
-  }
-  
   void updateOffsets(float newX, float newY) {
     offsetX = width/2 - newX;
     game.offsetX = offsetX;

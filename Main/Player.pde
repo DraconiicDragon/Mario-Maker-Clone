@@ -9,6 +9,8 @@ class Player {
   boolean direction;
   int walkAnimation;
   int frameCont;
+  int deathAnimationFrameCont;
+  int deathAnimationHeight;
   
   int health;
   boolean dead;
@@ -19,16 +21,19 @@ class Player {
   boolean jumping;
   
   final float GRAVITY = 20;
-  final float JUMP_SPEED = 64;
+  final float JUMP_SPEED = 80;
   final float MOVEMENT_SPEED = 15;
   
-  Player(float x, float y, float width, float height) {
-    small_mario = new PImage[2];
+  Player(float x, float y) {
+    small_mario = new PImage[5];
     small_mario[0] = loadImage("players/small_mario_0.png");
     small_mario[1] = loadImage("players/small_mario_1.png");
+    small_mario[2] = loadImage("players/small_mario_2.png");
+    small_mario[3] = loadImage("players/small_mario_3.png");
+    small_mario[4] = loadImage("players/small_mario_4.png");
     position = new PVector(x, y);
-    this.width = width;
-    this.height = height;
+    this.width = 64;
+    this.height = 64;
     movement = new PVector(0, 0);
     jumping = true;
     direction = true;
@@ -53,18 +58,35 @@ class Player {
        movement.y = lerp(movement.y, -JUMP_SPEED, 0.8);
        jumping = true;
     }
+    
+    position.x += movement.x;
+    position.y += movement.y;
   }
   
   void render(float offsetX, float offsetY) {
-    text(movement.x, 20, 20);
+    if(dead) {
+      deathAnimationFrameCont++;
+      if(deathAnimationFrameCont < 40) deathAnimationHeight -= 3;
+      else deathAnimationHeight += 5;
+      image(small_mario[4], position.x+offsetX, position.y+offsetY+deathAnimationHeight);      
+      return;
+    }
+    PImage animation = small_mario[walkAnimation];
+        
+    if(jumping) {
+      animation = small_mario[3];
+    } else if((direction && movement.x < 0) || (!direction && movement.x > 0) && abs(movement.x) > 10) {
+      animation = small_mario[2];
+    }
+    
     if(direction) {
       pushMatrix();
       scale(-1, 1);
-      image(small_mario[walkAnimation], -(position.x+offsetX+width), position.y+offsetY);
+      image(animation, -(position.x+offsetX+width), position.y+offsetY);
       popMatrix();
     }
     else {
-      image(small_mario[walkAnimation], position.x+offsetX, position.y+offsetY);
+      image(animation, position.x+offsetX, position.y+offsetY);
     }
     frameCont++;
     if(frameCont > 10) {
