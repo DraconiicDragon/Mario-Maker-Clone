@@ -7,23 +7,33 @@ class CollisionDetection {
         int x = map.getXCoordenate(i.position.x + i.width);
         int y1 = map.getYCoordenate(i.position.y);
         int y2 = map.getYCoordenate(i.position.y + i.height);
-        for(int j = y1; j < y2; j++) {
+        if(x == -1 || y1 == -1 || y2 == -1) {
+          i.dead = true;
+          return;
+        }
+        for(int j = y1; j < y2; j++) {          
           if(map.tiles[j][x].isSolid()) {
             i.position.x = map.tiles[j][x].position.x - i.width;
             i.movement.x = 0;
           }
+          if(map.tiles[j][x].id == 2) game.menu = true;
         }       
       }
       
       if(i.movement.x < 0) {
         int x = map.getXCoordenate(i.position.x);     
         int y1 = map.getYCoordenate(i.position.y);
-        int y2 = map.getYCoordenate(i.position.y + i.height);        
+        int y2 = map.getYCoordenate(i.position.y + i.height);
+        if(x == -1 || y1 == -1 || y2 == -1) {
+          i.dead = true;
+          return;
+        }
         for(int j = y1; j < y2; j++) {
           if(map.tiles[j][x].isSolid()) {
             i.position.x = map.tiles[j][x].position.x + map.tileSize;
             i.movement.x = 0;
           }
+          if(map.tiles[j][x].id == 2) game.menu = true;
         }
       }
                  
@@ -31,20 +41,30 @@ class CollisionDetection {
         int y = map.getYCoordenate(i.position.y + i.height);
         int x1 = map.getXCoordenate(i.position.x);
         int x2 = map.getXCoordenate(i.position.x + i.width - 1);
+        if(y == -1 || x1 == -1 || x2 == -1) {
+          i.dead = true;
+          return;
+        }
         for(int j = x1; j <= x2; j++) {
           if(map.tiles[y][j].isSolid()) {
             i.position.y = map.tiles[y][j].position.y - i.height;
             i.jumping = false;
           }
+          if(map.tiles[y][j].id == 2) game.menu = true;
         }
       }
       
       if(i.movement.y < 0) {
         int y = map.getYCoordenate(i.position.y);
         int x1 = map.getXCoordenate(i.position.x);
-        int x2 = map.getXCoordenate(i.position.x + i.width - 1);       
+        int x2 = map.getXCoordenate(i.position.x + i.width - 1);
+        if(y == -1 || x1 == -1 || x2 == -1) {
+          i.dead = true;
+          return;
+        }
         for(int j = x1; j <= x2; j++) {
           if(map.tiles[y][j].isSolid()) i.position.y = map.tiles[y][j].position.y + map.tileSize;
+          if(map.tiles[y][j].id == 2) game.menu = true;
         }
       }     
     }
@@ -59,6 +79,10 @@ class CollisionDetection {
         int x = map.getXCoordenate(i.position.x + i.width);
         int y1 = map.getYCoordenate(i.position.y);
         int y2 = map.getYCoordenate(i.position.y + i.height);
+        if(x == -1 || y1 == -1 || y2 == -1) {
+          i.dead = true;
+          return;
+        }
         for(int j = y1; j < y2; j++) {
           if(map.tiles[j][x].isSolid()) {
             i.position.x = map.tiles[j][x].position.x - i.width;
@@ -69,7 +93,11 @@ class CollisionDetection {
       if(i.movement.x < 0) {
         int x = map.getXCoordenate(i.position.x);     
         int y1 = map.getYCoordenate(i.position.y);
-        int y2 = map.getYCoordenate(i.position.y + i.height);        
+        int y2 = map.getYCoordenate(i.position.y + i.height);
+        if(x == -1 || y1 == -1 || y2 == -1) {
+          i.dead = true;
+          return;
+        }
         for(int j = y1; j < y2; j++) {
           if(map.tiles[j][x].isSolid()) {
             i.position.x = map.tiles[j][x].position.x + map.tileSize;
@@ -81,6 +109,10 @@ class CollisionDetection {
         int y = map.getYCoordenate(i.position.y + i.height);
         int x1 = map.getXCoordenate(i.position.x);
         int x2 = map.getXCoordenate(i.position.x + i.width);
+        if(y == -1 || x1 == -1 || x2 == -1) {
+          i.dead = true;
+          return;
+        }
         for(int j = x1; j <= x2; j++) {
           if(map.tiles[y][j].isSolid()) {
             i.position.y = map.tiles[y][j].position.y - i.height;
@@ -92,7 +124,11 @@ class CollisionDetection {
       if(i.movement.y < 0) {
         int y = map.getYCoordenate(i.position.y);
         int x1 = map.getXCoordenate(i.position.x);
-        int x2 = map.getXCoordenate(i.position.x + i.width);       
+        int x2 = map.getXCoordenate(i.position.x + i.width);
+        if(y == -1 || x1 == -1 || x2 == -1) {
+          i.dead = true;
+          return;
+        }
         for(int j = x1; j <= x2; j++) {
           if(map.tiles[y][j].isSolid()) i.position.y = map.tiles[y][j].position.y + map.tileSize;
         }

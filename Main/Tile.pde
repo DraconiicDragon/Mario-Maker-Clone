@@ -22,7 +22,7 @@ class Tile {
   
   boolean isSolid() {
     if(this.id == 1) return true;
-    else return false;
+    return false;
   }
 
 }

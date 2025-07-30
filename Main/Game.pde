@@ -16,6 +16,9 @@ class Game {
   PVector buttons[];
   
   PGraphics editMenu;
+  ArrayList<PGraphics> stageSelectStages;
+  PVector stagesPosition[];
+  String[] stagesPath;
   int selectedTile;
   
   PVector focusPosition;
@@ -23,6 +26,8 @@ class Game {
   boolean menu;
   boolean pause;
   boolean editing;
+  boolean stageSelect;
+  int selectedStage;
   
   float offsetX;
   float offsetY;
@@ -31,8 +36,13 @@ class Game {
     menu = true;
     pause = false;
     editing = false;
+    stageSelect = false;
+    
+    stagesPosition = new PVector[8];
+    stagesPath = new String[8];
     
     buttons = new PVector[2];
+    stageSelectStages = new ArrayList<>();
     
     titleScreen = loadImage("titlescreen.png");
     onePlayerButton = loadImage("1_player_button.png");
@@ -42,18 +52,14 @@ class Game {
     selectArrow = loadImage("select_arrow.png");
     
     selectedButton = 0;
+    selectedStage = 0;
     createEditMenu();
     
     players = new ArrayList<>();
     enemies = new ArrayList<>();
     collisionDetection = new CollisionDetection();
-    
-    
-    map = new Map("maps/0_tiles.txt");
-    loadEntities();
-    focusPlayer = players.get(0);    
-    camera = new Camera(map.startX, map.startY);    
-  }
+    createStageSelectMenu();
+  }  
   
   void createEditMenu() {
     editMenu = createGraphics(width, 84);
@@ -65,18 +71,56 @@ class Game {
     image = loadImage("tiles/1.png");
     editMenu.image(image, 64+20, 10);
     
-    image = loadImage("enemies/goomba_0.png");
+    image = loadImage("tiles/2.png");
     editMenu.image(image, 128+30, 10);
     
-    image = loadImage("enemies/boo_0.png");
+    image = loadImage("enemies/goomba_0.png");
     editMenu.image(image, 192+40, 10);
     
+    image = loadImage("enemies/boo_0.png");
+    editMenu.image(image, 256+50, 10);
+    
     image = loadImage("enemies/thwomp_0.png");
-    editMenu.image(image, 256+50, 10, 64, 64);
+    editMenu.image(image, 320+60, 10, 64, 64);
     
     image = loadImage("players/small_mario_0.png");
-    editMenu.image(image, 320+60, 10);
+    editMenu.image(image, 384+70, 10);
     editMenu.endDraw();
+  }
+  
+  void createStageSelectMenu() {
+    stageSelectStages = new ArrayList<>();
+    File folder = new File(dataPath("maps"));
+    String[] fileNames = folder.list();
+    int cont = 0;
+    for(String i : fileNames) {
+      String j[] = split(i, "_");
+      if(j[1].equals("icon.png")) {
+        stagesPath[cont] = j[0];
+        PImage image = loadImage("maps/"+i);
+        stageSelectStages.add(createGraphics(int(width*0.2), int(height*0.4)));
+        stageSelectStages.get(cont).beginDraw();
+        stageSelectStages.get(cont).image(image, 0, 0, width*0.2, height*0.4);
+        stageSelectStages.get(cont).endDraw();     
+        cont++;
+      }
+    }
+    for(int i = cont; i < 8; i++) {
+      stagesPath[i] = "";
+      stageSelectStages.add(createGraphics(int(width*0.2), int(height*0.4)));
+      stageSelectStages.get(i).beginDraw();
+      stageSelectStages.get(i).rect(0, 0, width*0.2, height*0.4);
+      stageSelectStages.get(i).endDraw();
+    }
+    float x = width*0.04, y = height*0.06;      
+    for(int i = 0; i < 8; i++) {
+      stagesPosition[i] = new PVector(x, y);
+      x += width*0.24;
+      if(x >= width) {
+        x = width*0.04;
+        y += height*0.46;
+      }
+    }
   }
   
   void run() {
@@ -91,6 +135,18 @@ class Game {
       image(onePlayerButton, buttons[0].x, buttons[0].y);
       image(mapEditButton, buttons[1].x, buttons[1].y);
       image(selectArrow, buttons[selectedButton].x - selectArrow.width, buttons[selectedButton].y);
+      return;
+    }
+    if(stageSelect) {
+      push();
+      fill(255, 204, 197);
+      rect(0, 0, width, height);
+      fill(50);
+      rect(stagesPosition[selectedStage].x-width*0.01, stagesPosition[selectedStage].y-height*0.01, width*0.22, height*0.42);
+      for(int i = 0; i < 8; i++) {
+        image(stageSelectStages.get(i), stagesPosition[i].x, stagesPosition[i].y);
+      }   
+      pop();
       return;
     }
     
@@ -120,20 +176,22 @@ class Game {
   }
   
   void tick() {
+     
+    if(menu) return;    
        
-    if(menu) return;
     
+    if(stageSelect) return;
     updateOffsets();
-       
     if(editing) return;
     
     // Stops the game if the main player dies
-    if(focusPlayer.dead) {
-      
+    if(focusPlayer.deathAnimationFrameCont*3 > 255) {      
+      menu = true;
       return;
     }
     
     for(Player i : players) {
+      if(i.dead) continue;
       i.tick();      
     }
    
@@ -146,12 +204,44 @@ class Game {
     }
     collisionDetection.playerMap(players, map);
     collisionDetection.enemyMap(enemies, map);
-    collisionDetection.playerEnemy(players, enemies);
-       
+    collisionDetection.playerEnemy(players, enemies);       
+  }
+  
+  void createNewMap() {
+    PrintWriter fileWriter = createWriter("data/maps/"+ selectedStage +"_tiles.txt");
+    fileWriter.println(120 + " "+ 40);
+    for(int i = 0; i < 40; i++) {
+      for(int j = 0; j < 120; j++) {
+        fileWriter.print("0");
+        if(j != 119) fileWriter.print(" ");
+      }
+      if(i != 39) fileWriter.println();
+    }
+    fileWriter.close();
+    fileWriter = createWriter("data/maps/"+ selectedStage +"_entities.txt");
+    fileWriter.println("0 0 class Main$Player");
+    fileWriter.close();
+    fileWriter = createWriter("data/maps/"+ selectedStage +"_icon.png");
+    fileWriter.close();
+    //stagesPath[selectedStage] = selectedStage+"";
+    createStageSelectMenu();
+  }
+  
+  void loadMap(String path) {
+    if(path.equals("maps/")) {      
+      createNewMap();
+      path += selectedStage;
+    }
+    players = new ArrayList<>();
+    enemies = new ArrayList<>();
+    map = new Map(path+"_tiles.txt");
+    loadEntities(path+"_entities.txt");
+    focusPlayer = players.get(0);    
+    camera = new Camera(map.startX, map.startY); 
   }
   
   void saveEntities() {
-    PrintWriter fileWriter = createWriter("data/maps/0_entities.txt");
+    PrintWriter fileWriter = createWriter("data/maps/"+selectedStage+"_entities.txt");
     for(Player i : players) {
       fileWriter.println(i.position.x + " " + i.position.y + " " + i.getClass());
     }
@@ -161,8 +251,8 @@ class Game {
     fileWriter.close();
   }
   
-  void loadEntities() {
-    BufferedReader fileReader = createReader("maps/0_entities.txt");
+  void loadEntities(String path) {
+    BufferedReader fileReader = createReader(path);
     String line;
     try {
       while((line = fileReader.readLine()) != null) {
@@ -192,7 +282,7 @@ class Game {
   }
   
   void mousePressed() {
-    if(editing && selectedTile < 2) map.mousePressed(selectedTile);
+    if(editing && selectedTile < 3) map.mousePressed(selectedTile);
     if(editing && selectedTile > 99) {
       
       if(selectedTile == 100) enemies.add(new Goomba(new PVector(mouseX-offsetX, mouseY-offsetY)));
@@ -206,11 +296,10 @@ class Game {
   }
   
   void keyPressed() {
-    println(keyCode);
     if(menu) {
       if(keyCode == 87) {
-      selectedButton--;
-      if(selectedButton < 0) selectedButton = 0;
+        selectedButton--;
+        if(selectedButton < 0) selectedButton = 0;
       }
       else if(keyCode == 83) {
         selectedButton++;
@@ -221,15 +310,29 @@ class Game {
           menu = false;
           pause = false;
           editing = false;
-          focusPosition = focusPlayer.position;
+          stageSelect = true;           
           return;
-        } else if(selectedButton == 1) {
+        } else if(selectedButton == 1) {          
           menu = false;
           pause = false;
           editing = true;
+          stageSelect = true;
           focusPosition = new PVector(width/2, height/2);
           return;
         }
+      }
+    }
+    if(stageSelect) {
+      if(keyCode == 68 && selectedStage + 1 < 8) selectedStage++;
+      if(keyCode == 65 && selectedStage - 1 >= 0) selectedStage--;
+      if(keyCode == 87 && selectedStage - 4 >= 0) selectedStage -= 4;
+      if(keyCode == 83 && selectedStage + 4 < 8) selectedStage += 4;
+      if(keyCode == 32) {      
+        menu = false;
+        pause = false;
+        stageSelect = false;
+        loadMap("maps/"+stagesPath[selectedStage]);
+        if(selectedButton == 0) focusPosition = focusPlayer.position;
       }
     }
     if(editing) {
@@ -240,10 +343,11 @@ class Game {
        
       if(keyCode == 49) selectedTile = 0;
       if(keyCode == 50) selectedTile = 1;
-      if(keyCode == 51) selectedTile = 100;
-      if(keyCode == 52) selectedTile = 101;
-      if(keyCode == 53) selectedTile = 102;
-      if(keyCode == 54) selectedTile = 103;
+      if(keyCode == 51) selectedTile = 2;
+      if(keyCode == 52) selectedTile = 100;
+      if(keyCode == 53) selectedTile = 101;
+      if(keyCode == 54) selectedTile = 102;
+      if(keyCode == 55) selectedTile = 103;
       
       if(keyCode == 10) {
         map.saveMap();
@@ -255,11 +359,16 @@ class Game {
       return;      
     }
     
-    if(!menu && !editing && !pause) focusPlayer.keyPressed();    
+    if(!menu && !editing && !pause && !stageSelect) {
+      focusPlayer.keyPressed();
+      if(keyCode == 10) {
+        menu = true;
+      }
+    }
   }
   
   void keyReleased() {
-    focusPlayer.keyReleased();
+    if(!menu && !editing && !pause && !stageSelect) focusPlayer.keyReleased();
   }
   
 }

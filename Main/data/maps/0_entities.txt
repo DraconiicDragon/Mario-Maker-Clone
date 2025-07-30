@@ -1,1 +1,4 @@
-264.0 2301.0 class Main$Player
+236.0 2378.0 class Main$Player
+827.0 2383.0 class Main$Goomba
+3020.0 2300.0 class Main$Boo
+4682.0 1944.0 class Main$Thwomp

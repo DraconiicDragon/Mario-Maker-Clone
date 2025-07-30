@@ -36,9 +36,10 @@ class Map {
     
     startX = (width - tileSize * mapWidth) / 2;
     startY = (height - tileSize * mapHeight) / 2;
-    tileTexture = new PImage[2];
+    tileTexture = new PImage[3];
     tileTexture[0] = loadImage("tiles/0.png");
     tileTexture[1] = loadImage("tiles/1.png");
+    tileTexture[2] = loadImage("tiles/2.png");
   }
   
   void saveMap() {
@@ -66,12 +67,16 @@ class Map {
     }
   }
   
-  int getXCoordenate(float x) {
-    return int((x) / tileSize);
+  int getXCoordenate(float x) { 
+    int mx = int((x) / tileSize);
+    if(mx < mapWidth && mx >= 0) return mx;
+    return -1;
   }
   
   int getYCoordenate(float y) {
-    return int((y) / tileSize);
+    int my = int((y) / tileSize);
+    if(my < mapHeight && my >= 0) return my;
+    return -1;
   }
   
   void mousePressed(int selectedTile) {
