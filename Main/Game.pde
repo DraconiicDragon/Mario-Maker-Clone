@@ -166,6 +166,10 @@ class Game {
     if(editing) {
       if(offsetY < 0) image(editMenu, 0, 0);
       else if(offsetY == 0) image(editMenu, 0, height-84);
+      push();
+      fill(255, 255, 255, 126);
+      rect(map.getXCoordenate(mouseX)*64, map.getYCoordenate(mouseY)*64, 64, 64);
+      pop();
       return;
     }
     
@@ -234,7 +238,7 @@ class Game {
     }
     players = new ArrayList<>();
     enemies = new ArrayList<>();
-    map = new Map(path+"_tiles.txt");
+    map = new Map(path);
     loadEntities(path+"_entities.txt");
     focusPlayer = players.get(0);    
     camera = new Camera(map.startX, map.startY); 

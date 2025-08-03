@@ -12,14 +12,6 @@ class Tile {
     return position;
   }
   
-  float getPositionX(int x, float scale) {
-    return x*scale;
-  }
-  
-  float getPositionY(int y, float scale) {
-    return y*scale;
-  }
-  
   boolean isSolid() {
     if(this.id == 1) return true;
     return false;

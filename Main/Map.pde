@@ -6,34 +6,17 @@ class Map {
   float startX;
   float startY;
   float tileSize = 64;
-  String map;
+  String mapName;
   
-  Map(String map) {
-    this.map = map;
-    BufferedReader fileReader = createReader(map);
-    String line;
-    try {
-      line = fileReader.readLine();
-      String[] ids = split(line, " ");
-      mapWidth = int(ids[0]);
-      mapHeight = int(ids[1]);
-      tiles = new Tile[mapHeight][mapWidth];
-      int x = 0;
-      int y = 0;
-      while((line = fileReader.readLine()) != null) {
-        ids = split(line, " ");      
-        for(String i : ids) {   
-          tiles[y][x] = new Tile(int(i), new PVector(x*tileSize, y*tileSize));
-          x++;
-        }
-        x = 0;
-        y++;
-        
-      }
-    } catch(IOException e) {
-      e.printStackTrace();
-    }
+  ArrayList<Enemy> enemies;
     
+  Map(String mapName) {
+    this.mapName = mapName;  
+    mapHeight = 40;
+    mapWidth = 120;
+    tiles = new Tile[40][120];
+    loadMap();
+        
     startX = (width - tileSize * mapWidth) / 2;
     startY = (height - tileSize * mapHeight) / 2;
     tileTexture = new PImage[3];
@@ -42,6 +25,45 @@ class Map {
     tileTexture[2] = loadImage("tiles/2.png");
   }
   
+  void saveMap() {
+    JSONArray saveFile = new JSONArray();
+    
+    for(int i = 0; i < mapHeight; i++) {
+      for(int j = 0; j < mapWidth; j++) {
+        
+        // Skip saving air tiles
+        if(tiles[i][j].id == 0) continue;
+        
+        JSONObject tile = new JSONObject();
+        tile.setInt("id", tiles[i][j].id);
+        tile.setInt("x", j);
+        tile.setInt("y", i);
+        saveFile.append(tile);
+      }
+    }
+    //saveJSONArray(saveFile, "data/maps/" + mapName + "/tiles.json");
+    saveJSONArray(saveFile, "data/" + mapName + "_tiles.json"); 
+  }
+  
+  void loadMap() {
+    //JSONArray saveFile = loadJSONArray("/maps/" + mapName + "/tiles.json");
+    for(int i = 0; i < mapHeight; i++) {
+      for(int j = 0; j < mapWidth; j++) {
+        tiles[i][j] = new Tile(0, new PVector(j*tileSize, i*tileSize));
+      }
+    }
+    JSONArray saveFile = loadJSONArray(mapName + "_tiles.json");
+    
+    for(int i = 0; i < saveFile.size(); i++) {
+      JSONObject tile = saveFile.getJSONObject(i);
+      int x = tile.getInt("x");
+      int y = tile.getInt("y");
+      int id = tile.getInt("id");
+      tiles[y][x] = new Tile(id, new PVector(x*tileSize, y*tileSize));
+    }
+  }
+  
+  /*
   void saveMap() {
     PrintWriter fileWriter = createWriter("data/" + map);
     fileWriter.println(mapWidth + " " + mapHeight);
@@ -54,6 +76,7 @@ class Map {
     }
     fileWriter.close();
   }
+  */
   
   void render() {
     float x = startX, y = startY;
