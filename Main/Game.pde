@@ -57,7 +57,8 @@ class Game {
     
     players = new ArrayList<>();
     enemies = new ArrayList<>();
-    collisionDetection = new CollisionDetection();
+       
+    collisionDetection = new CollisionDetection();    
     createStageSelectMenu();
   }  
   
@@ -202,7 +203,6 @@ class Game {
       
       i.tick(focusPlayer);
     }
-    collisionDetection.playerMap(players, map);
     collisionDetection.enemyMap(enemies, map);
     collisionDetection.playerEnemy(players, enemies);       
   }
@@ -238,6 +238,7 @@ class Game {
     loadEntities(path+"_entities.txt");
     focusPlayer = players.get(0);    
     camera = new Camera(map.startX, map.startY); 
+    CollisionDetection.changeMap(map);
   }
   
   void saveEntities() {

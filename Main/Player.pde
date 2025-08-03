@@ -79,7 +79,11 @@ class Player {
     if(up && !jumping) {
        movement.y = lerp(movement.y, -JUMP_HEIGHT, 0.8);
        jumping = true;
-    }    
+    }
+    position.x += movement.x;
+    CollisionDetection.playerXMap(this);
+    position.y += movement.y;
+    CollisionDetection.playerYMap(this);
   }
   
   void render(float offsetX, float offsetY) {
