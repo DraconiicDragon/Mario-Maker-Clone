@@ -21,7 +21,7 @@ class Player {
   boolean jumping;
   
   final float GRAVITY = 20;
-  final float JUMP_SPEED = 80;
+  final float JUMP_HEIGHT = 80;
   final float MOVEMENT_SPEED = 15;
   
   Player(float x, float y) {
@@ -40,6 +40,28 @@ class Player {
     walkAnimation = 0;
     health = 1;
   }
+  
+  void upCollision() {
+    movement.y = 0;
+  }
+  
+  void downCollision() {
+    jumping = false;
+    movement.y = 0;
+  }
+  
+  void die() {
+    dead = true;
+    movement.x = 0;
+    movement.y = 0;
+  }
+  
+  void takeDamage() {
+    health--;
+    if(health <= 0) {
+      die();
+    }
+  }
     
   void tick() {
     movement.y = lerp(movement.y, GRAVITY, 0.1);
@@ -55,12 +77,9 @@ class Player {
       movement.x = lerp(movement.x, 0, 0.1);
     }
     if(up && !jumping) {
-       movement.y = lerp(movement.y, -JUMP_SPEED, 0.8);
+       movement.y = lerp(movement.y, -JUMP_HEIGHT, 0.8);
        jumping = true;
-    }
-    
-    position.x += movement.x;
-    position.y += movement.y;
+    }    
   }
   
   void render(float offsetX, float offsetY) {
@@ -73,7 +92,7 @@ class Player {
     }
     PImage animation = small_mario[walkAnimation];
         
-    if(jumping) {
+    if(movement.y != 0) {
       animation = small_mario[3];
     } else if((direction && movement.x < 0) || (!direction && movement.x > 0) && abs(movement.x) > 10) {
       animation = small_mario[2];
@@ -95,15 +114,6 @@ class Player {
         walkAnimation++;
         if(walkAnimation > 1) walkAnimation = 0;
       }
-    }
-  }
-  
-  void takeDamage() {
-    health--;
-    if(health <= 0) {
-      dead = true;
-      movement.x = 0;
-      movement.y = 0;
     }
   }
   
